@@ -19,10 +19,13 @@ struct Args {
     sort_files: bool,
 
     #[clap(short = 'i', long)]
-    include_private: bool,
+    include_hidden: bool,
 
     #[clap(short = 'l', long)]
     list_all: bool,
+
+    #[clap(short = 'g', long)]
+    include_gitignored: bool,
 }
 
 fn main() {
@@ -50,6 +53,6 @@ fn main() {
     }
 
     if args.list_all {
-        print_file_size(args.path);
+        print_file_size(args.path, args.include_hidden);
     }
 }
