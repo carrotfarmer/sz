@@ -12,7 +12,7 @@ use std::path;
 
 use std::io::ErrorKind;
 
-use crate::walk_dir::print_file_size;
+use crate::walk_dir::{print_file_size, print_dir_size};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -52,6 +52,8 @@ fn main() {
 
         if args.list_all {
             print_file_size(args.path, args.include_hidden, args.include_gitignored);
+        } else {
+            print_dir_size(args.path, args.include_hidden, args.include_gitignored);
         } 
 
     } else {

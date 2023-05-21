@@ -60,3 +60,48 @@ pub fn print_file_size(path: path::PathBuf, include_hidden: bool, include_gitign
     table.with(style);
     println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
 }
+
+pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_gitignored: bool) {
+    let mut total_size = 0.0;
+
+    for entry in WalkBuilder::new(dir_path)
+        .hidden(!include_hidden)
+        .git_ignore(!include_gitignored)
+        .build()
+    {
+        match entry {
+            Ok(entry) => {
+                if entry.path().is_file() {
+                    total_size += get_file_size(entry.path());
+                }
+            }
+
+            Err(e) => println!("sz: error while reading path: {}", e),
+        }
+    }
+
+    let dir_size = File::new("Total".to_string(), total_size);
+    let mut table = Table::new(&[dir_size]);
+    let mut style = RawStyle::from(Style::extended());
+
+    style
+        .set_color_top(Color::FG_BRIGHT_BLUE)
+        .set_color_bottom(Color::FG_BRIGHT_BLUE)
+        .set_color_left(Color::FG_BRIGHT_BLUE)
+        .set_color_right(Color::FG_BRIGHT_BLUE)
+        .set_color_corner_top_left(Color::FG_BRIGHT_BLUE)
+        .set_color_corner_top_right(Color::FG_BRIGHT_BLUE)
+        .set_color_corner_bottom_left(Color::FG_BRIGHT_BLUE)
+        .set_color_corner_bottom_right(Color::FG_BRIGHT_BLUE)
+        .set_color_intersection_bottom(Color::FG_BRIGHT_BLUE)
+        .set_color_intersection_top(Color::FG_BRIGHT_BLUE)
+        .set_color_intersection_right(Color::FG_BRIGHT_BLUE)
+        .set_color_intersection_left(Color::FG_BRIGHT_BLUE)
+        .set_color_intersection(Color::FG_BRIGHT_BLUE)
+        .set_color_horizontal(Color::FG_BRIGHT_BLUE)
+        .set_color_vertical(Color::FG_BRIGHT_BLUE);
+
+    table.with(style);
+
+    println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
+}
