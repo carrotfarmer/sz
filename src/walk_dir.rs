@@ -26,8 +26,7 @@ pub fn print_file_size(path: path::PathBuf, include_hidden: bool, include_gitign
                 let path = entry.path();
 
                 if path.is_file() {
-                    let file_name = String::from(path.file_name().unwrap().to_str().unwrap());
-
+                    let file_name = path.to_str().unwrap().to_string();
                     let file = File::new(file_name, get_file_size(path));
 
                     files.push(file);
