@@ -1,4 +1,5 @@
 mod file;
+mod file_size;
 mod utils;
 mod walk_dir;
 
