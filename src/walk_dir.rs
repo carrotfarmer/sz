@@ -5,23 +5,24 @@ use ignore::WalkBuilder;
 use tabled::{
     settings::{
         style::{RawStyle, Style},
-        Color,
+        Color, Panel,
     },
     Table,
 };
 
-use crate::{file::File, SortOpt};
 use crate::utils::get_file_size;
+use crate::{file::File, SortOpt};
 
 pub fn print_file_size(
     path: path::PathBuf,
     include_hidden: bool,
     include_gitignored: bool,
     sort_opt: SortOpt,
+    mut num_files: Option<usize>,
 ) {
     let mut files = vec![];
 
-    for result in WalkBuilder::new(path)
+    for result in WalkBuilder::new(&path)
         .hidden(!include_hidden)
         .git_ignore(!include_gitignored)
         .build()
@@ -31,7 +32,23 @@ pub fn print_file_size(
                 let path = entry.path();
 
                 if path.is_file() {
-                    let file_name = path.to_str().unwrap().to_string();
+                    let mut file_name = path.to_str().unwrap().to_string();
+
+                    if file_name.len() > 35 {
+                        // file_name = file_name.chars().rev().collect::<String>().to_string();
+
+                        file_name = file_name
+                            .chars()
+                            .rev()
+                            .take(30)
+                            .collect::<String>()
+                            .chars()
+                            .rev()
+                            .collect::<String>();
+
+                        file_name.insert_str(0, "...");
+                    }
+
                     let file = File::new(file_name, get_file_size(path));
 
                     files.push(file);
@@ -48,9 +65,24 @@ pub fn print_file_size(
         _ => (),
     }
 
+    let file_len = files.len();
+
+    if file_len > 50 && num_files.is_none() {
+        println!(
+            "sz: warning: detected {} files, only showing first 20",
+            file_len
+        );
+        num_files = Some(50);
+    }
+
     let total_size = files
         .iter()
         .fold(0.0, |acc, file| acc + file.clone().bytes());
+
+    if let Some(num_files) = num_files {
+        files.truncate(num_files)
+    }
+
     let total = File::new("TOTAL SIZE".to_string(), total_size);
     files.push(total);
 
@@ -74,7 +106,10 @@ pub fn print_file_size(
         .set_color_vertical(Color::FG_MAGENTA);
 
     let mut table = Table::new(&files);
-    table.with(style);
+    table
+        .with(Panel::footer(format!("{} files parsed", file_len)))
+        .with(style);
+
     println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
 }
 

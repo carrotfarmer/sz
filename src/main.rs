@@ -38,6 +38,10 @@ struct Args {
     /// Include gitignored files
     #[clap(short = 'g', long)]
     include_gitignored: bool,
+
+    /// Number of files to list
+    #[clap(short = 'n', long)]
+    num_files: Option<usize>,
 }
 
 pub enum SortOpt {
@@ -81,6 +85,7 @@ fn main() {
                 args.include_hidden,
                 args.include_gitignored,
                 sort,
+                args.num_files,
             );
         } else {
             print_dir_size(args.path, args.include_hidden, args.include_gitignored);
