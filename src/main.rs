@@ -52,21 +52,14 @@ fn main() {
 
         if args.list_all {
             print_file_size(args.path, args.include_hidden, args.include_gitignored);
-        } else {
-            if let None = args.path.file_name() {
-                println!("sz: could not read file: {}", args.path.display());
-            }
+        } 
 
-            let file_name = String::from(args.path.file_name().unwrap().to_str().unwrap());
-
-            let file = File::new(file_name, get_file_size(args.path.as_path()));
-            println!("{}", file);
-        }
     } else {
         let file = File::new(
             String::from(args.path.file_name().unwrap().to_str().unwrap()),
             get_file_size(args.path.as_path()),
         );
+
         println!("{}", file);
     }
 }
