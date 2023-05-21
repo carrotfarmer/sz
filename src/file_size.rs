@@ -50,6 +50,6 @@ impl FileSize {
 
 impl Display for FileSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}", self.value, self.units)
+        write!(f, "{:.2}{}", self.value, self.units)
     }
 }

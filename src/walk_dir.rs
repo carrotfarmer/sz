@@ -1,5 +1,4 @@
 use std::path;
-// use walkdir::WalkDir;
 
 use ignore::WalkBuilder;
 
