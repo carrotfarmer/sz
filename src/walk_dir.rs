@@ -10,10 +10,15 @@ use tabled::{
     Table,
 };
 
-use crate::file::File;
-use crate::utils::get_file_size;
+use crate::{file::File, SortOpt};
+use crate::{file_size, utils::get_file_size};
 
-pub fn print_file_size(path: path::PathBuf, include_hidden: bool, include_gitignored: bool) {
+pub fn print_file_size(
+    path: path::PathBuf,
+    include_hidden: bool,
+    include_gitignored: bool,
+    sort_opt: SortOpt,
+) {
     let mut files = vec![];
 
     for result in WalkBuilder::new(path)
@@ -36,6 +41,18 @@ pub fn print_file_size(path: path::PathBuf, include_hidden: bool, include_gitign
             Err(e) => println!("sz: error while reading path: {}", e),
         }
     }
+
+    match sort_opt {
+        SortOpt::Asc => files.sort_by(|a, b| a.bytes().partial_cmp(&b.bytes()).unwrap()),
+        SortOpt::Desc => files.sort_by(|a, b| b.bytes().partial_cmp(&a.bytes()).unwrap()),
+        _ => (),
+    }
+
+    let total_size = files
+        .iter()
+        .fold(0.0, |acc, file| acc + file.clone().bytes());
+    let total = File::new("TOTAL SIZE".to_string(), total_size);
+    files.push(total);
 
     let mut style = RawStyle::from(Style::extended());
 

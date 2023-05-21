@@ -12,23 +12,38 @@ use std::path;
 
 use std::io::ErrorKind;
 
-use crate::walk_dir::{print_file_size, print_dir_size};
+use crate::walk_dir::{print_dir_size, print_file_size};
 
 #[derive(Parser, Debug)]
 struct Args {
+    /// Path to file or directory
     path: path::PathBuf,
 
-    #[clap(short = 's', long)]
-    sort_files: bool,
+    /// Sort files by size in descending order
+    #[clap(short = 'd', long)]
+    sort_files_desc: bool,
 
+    /// Sort files by size in ascending order
+    #[clap(short = 'a', long)]
+    sort_files_asc: bool,
+
+    /// Include hidden files
     #[clap(short = 'i', long)]
     include_hidden: bool,
 
+    /// List all files in directory
     #[clap(short = 'l', long)]
     list_all: bool,
 
+    /// Include gitignored files
     #[clap(short = 'g', long)]
     include_gitignored: bool,
+}
+
+pub enum SortOpt {
+    Asc,
+    Desc,
+    Def,
 }
 
 fn main() {
@@ -51,11 +66,25 @@ fn main() {
         }
 
         if args.list_all {
-            print_file_size(args.path, args.include_hidden, args.include_gitignored);
+            let sort: SortOpt;
+
+            if args.sort_files_asc {
+                sort = SortOpt::Asc;
+            } else if args.sort_files_desc {
+                sort = SortOpt::Desc;
+            } else {
+                sort = SortOpt::Def;
+            }
+
+            print_file_size(
+                args.path,
+                args.include_hidden,
+                args.include_gitignored,
+                sort,
+            );
         } else {
             print_dir_size(args.path, args.include_hidden, args.include_gitignored);
-        } 
-
+        }
     } else {
         let file = File::new(
             String::from(args.path.file_name().unwrap().to_str().unwrap()),

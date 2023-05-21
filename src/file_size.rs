@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use tabled::Tabled;
 
-#[derive(Tabled)]
+#[derive(Tabled, Clone)]
 pub struct FileSize {
     value: f64,
     units: String,
@@ -48,6 +48,14 @@ impl FileSize {
             value: val,
             units: un,
         }
+    }
+
+    pub fn value(self) -> f64 {
+        self.value
+    }
+
+    pub fn units(self) -> String {
+        self.units
     }
 }
 

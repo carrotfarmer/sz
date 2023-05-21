@@ -11,20 +11,36 @@ use tabled::{
     Table, Tabled,
 };
 
-#[derive(Tabled)]
+#[derive(Tabled, Clone)]
 pub struct File {
     file_name: String,
     file_size: FileSize,
+    
+    #[tabled(skip)]
+    bytes: f64,
 }
 
 impl File {
-    pub fn new(file_name: String, file_size: f64) -> Self {
-        let file_size = FileSize::new(file_size);
+    pub fn new(file_name: String, file_size_bytes: f64) -> Self {
+        let file_size = FileSize::new(file_size_bytes);
 
         Self {
             file_name,
             file_size,
+            bytes: file_size_bytes,
         }
+    }
+
+    pub fn file_name(self) -> String {
+        self.file_name
+    }
+
+    pub fn file_size(self) -> FileSize {
+        self.file_size
+    }
+
+    pub fn bytes(&self) -> f64 {
+        self.bytes
     }
 }
 
