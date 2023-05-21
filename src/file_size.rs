@@ -1,5 +1,8 @@
 use std::fmt::Display;
 
+use tabled::Tabled;
+
+#[derive(Tabled)]
 pub struct FileSize {
     value: f64,
     units: String,

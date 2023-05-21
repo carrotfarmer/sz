@@ -4,6 +4,8 @@ mod utils;
 mod walk_dir;
 
 use clap::Parser;
+use file::File;
+use utils::get_file_size;
 
 use std::fs;
 use std::path;
@@ -32,28 +34,39 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let buf = fs::read_dir(&args.path);
+    if args.path.is_dir() {
+        let buf = fs::read_dir(&args.path);
 
-    match (args.path.is_dir(), args.path.is_file()) {
-        (true, false) => println!("{} is a directory", args.path.display()),
-        (false, true) => println!("{} is a file", args.path.display()),
-        _ => {
-            if let Err(e) = buf {
-                match e.kind() {
-                    ErrorKind::NotFound => {
-                        println!(
-                            "sz: error while reading path: `{}` not found",
-                            args.path.display()
-                        );
-                    }
-
-                    _ => println!("sz: error while reading path: {}", e),
+        if let Err(e) = buf {
+            match e.kind() {
+                ErrorKind::NotFound => {
+                    println!(
+                        "sz: error while reading path: `{}` not found",
+                        args.path.display()
+                    );
                 }
+
+                _ => println!("sz: error while reading path: {}", e),
             }
         }
-    }
 
-    if args.list_all {
-        print_file_size(args.path, args.include_hidden, args.include_gitignored);
+        if args.list_all {
+            print_file_size(args.path, args.include_hidden, args.include_gitignored);
+        } else {
+            if let None = args.path.file_name() {
+                println!("sz: could not read file: {}", args.path.display());
+            }
+
+            let file_name = String::from(args.path.file_name().unwrap().to_str().unwrap());
+
+            let file = File::new(file_name, get_file_size(args.path.as_path()));
+            println!("{}", file);
+        }
+    } else {
+        let file = File::new(
+            String::from(args.path.file_name().unwrap().to_str().unwrap()),
+            get_file_size(args.path.as_path()),
+        );
+        println!("{}", file);
     }
 }
