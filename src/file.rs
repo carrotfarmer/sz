@@ -13,7 +13,10 @@ use tabled::{
 
 #[derive(Tabled, Clone)]
 pub struct File {
+    #[tabled(rename = "file/dir name")]
     file_name: String,
+
+    #[tabled(rename = "size")]
     file_size: FileSize,
     
     #[tabled(skip)]

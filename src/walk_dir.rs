@@ -11,7 +11,7 @@ use tabled::{
 };
 
 use crate::{file::File, SortOpt};
-use crate::{file_size, utils::get_file_size};
+use crate::utils::get_file_size;
 
 pub fn print_file_size(
     path: path::PathBuf,
@@ -81,7 +81,7 @@ pub fn print_file_size(
 pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_gitignored: bool) {
     let mut total_size = 0.0;
 
-    for entry in WalkBuilder::new(dir_path)
+    for entry in WalkBuilder::new(&dir_path)
         .hidden(!include_hidden)
         .git_ignore(!include_gitignored)
         .build()
@@ -97,7 +97,10 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
         }
     }
 
-    let dir_size = File::new("Total".to_string(), total_size);
+    let dir_size = File::new(
+        dir_path.file_name().unwrap().to_str().unwrap().to_string(),
+        total_size,
+    );
     let mut table = Table::new(&[dir_size]);
     let mut style = RawStyle::from(Style::extended());
 
