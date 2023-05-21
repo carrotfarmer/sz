@@ -1,6 +1,6 @@
+mod file;
 mod utils;
 mod walk_dir;
-mod file;
 
 use clap::Parser;
 
@@ -53,6 +53,6 @@ fn main() {
     }
 
     if args.list_all {
-        print_file_size(args.path, args.include_hidden);
+        print_file_size(args.path, args.include_hidden, args.include_gitignored);
     }
 }
