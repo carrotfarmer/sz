@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use crate::file_size::FileSize;
 
+use owo_colors::OwoColorize;
 use tabled::{
     settings::{
         style::{RawStyle, Style},
@@ -51,7 +52,7 @@ impl Display for File {
         let mut table = Table::new(&[self]);
 
         table.with(style);
-        write!(f, "{}", table)?;
+        write!(f, "{}", table.bold())?;
 
         Ok(())
     }

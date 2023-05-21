@@ -58,6 +58,5 @@ pub fn print_file_size(path: path::PathBuf, include_hidden: bool, include_gitign
 
     let mut table = Table::new(&files);
     table.with(style);
-
-    println!("{}", table);
+    println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
 }
