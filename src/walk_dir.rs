@@ -1,3 +1,4 @@
+use std::fs;
 use std::path;
 
 use ignore::WalkBuilder;
@@ -13,13 +14,15 @@ use tabled::{
 use crate::utils::get_file_size;
 use crate::{file::File, SortOpt};
 
-pub fn print_file_size(
+pub fn print_dir_size_with_files(
     path: path::PathBuf,
     include_hidden: bool,
     include_gitignored: bool,
     sort_opt: SortOpt,
     mut num_files: Option<usize>,
 ) {
+    clearscreen::clear().unwrap();
+
     let mut files = vec![];
 
     for result in WalkBuilder::new(&path)
@@ -69,10 +72,10 @@ pub fn print_file_size(
 
     if file_len > 50 && num_files.is_none() {
         println!(
-            "sz: warning: detected {} files, only showing first 20",
+            "\x1b[1;33mwarning: {} files found, showing first 20\x1b[0m",
             file_len
         );
-        num_files = Some(50);
+        num_files = Some(20);
     }
 
     let total_size = files
@@ -133,7 +136,23 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
     }
 
     let dir_size = File::new(
-        dir_path.file_name().unwrap().to_str().unwrap().to_string(),
+        if let Some(dir_name) = dir_path.file_name() {
+            fs::canonicalize(dir_path)
+                .unwrap()
+                .file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string()
+        } else {
+            fs::canonicalize(dir_path)
+                .unwrap()
+                .file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string()
+        },
         total_size,
     );
     let mut table = Table::new(&[dir_size]);
@@ -158,5 +177,8 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
 
     table.with(style);
 
-    println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
+    println!(
+        "{}",
+        owo_colors::OwoColorize::white(&owo_colors::OwoColorize::bold(&table.to_string()))
+    );
 }

@@ -12,18 +12,18 @@ use std::path;
 
 use std::io::ErrorKind;
 
-use crate::walk_dir::{print_dir_size, print_file_size};
+use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
 
 #[derive(Parser, Debug)]
 struct Args {
     /// Path to file or directory
     path: path::PathBuf,
 
-    /// Sort files by size in descending order
+    /// Sort files by size in descending order (with -l flag)
     #[clap(short = 'd', long)]
     sort_files_desc: bool,
 
-    /// Sort files by size in ascending order
+    /// Sort files by size in ascending order (with -l flag)
     #[clap(short = 'a', long)]
     sort_files_asc: bool,
 
@@ -80,7 +80,7 @@ fn main() {
                 sort = SortOpt::Def;
             }
 
-            print_file_size(
+            print_dir_size_with_files(
                 args.path,
                 args.include_hidden,
                 args.include_gitignored,
