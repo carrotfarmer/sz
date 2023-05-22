@@ -38,8 +38,6 @@ pub fn print_dir_size_with_files(
                     let mut file_name = path.to_str().unwrap().to_string();
 
                     if file_name.len() > 35 {
-                        // file_name = file_name.chars().rev().collect::<String>().to_string();
-
                         file_name = file_name
                             .chars()
                             .rev()
@@ -89,7 +87,7 @@ pub fn print_dir_size_with_files(
     let total = File::new("TOTAL SIZE".to_string(), total_size);
     files.push(total);
 
-    let mut style = RawStyle::from(Style::extended());
+    let mut style = RawStyle::from(Style::psql());
 
     style
         .set_color_top(Color::FG_MAGENTA)
@@ -108,9 +106,16 @@ pub fn print_dir_size_with_files(
         .set_color_horizontal(Color::FG_MAGENTA)
         .set_color_vertical(Color::FG_MAGENTA);
 
+
     let mut table = Table::new(&files);
+
     table
-        .with(Panel::footer(format!("{} files parsed", file_len)))
+        .with(Panel::horizontal(
+            files.len(),
+            // make the separator magenta with escape sequences
+            format!("\x1b[35m{}\x1b[0m", "-".repeat(table.total_width())),
+        ))
+        .with(Panel::footer(format!("\x1b[35m{}\x1b[0m files parsed", file_len)))
         .with(style);
 
     println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
@@ -136,7 +141,7 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
     }
 
     let dir_size = File::new(
-        if let Some(dir_name) = dir_path.file_name() {
+        if let Some(_) = dir_path.file_name() {
             fs::canonicalize(dir_path)
                 .unwrap()
                 .file_name()
