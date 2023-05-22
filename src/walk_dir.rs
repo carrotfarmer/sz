@@ -11,14 +11,11 @@ use tabled::{
     Table,
 };
 
-use crate::Args;
 use crate::utils::get_file_size;
+use crate::Args;
 use crate::{file::File, SortOpt};
 
-pub fn print_dir_size_with_files(
-    args: &mut Args,
-    sort_opt: SortOpt,
-) {
+pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     clearscreen::clear().unwrap();
 
     let mut files = vec![];
@@ -33,10 +30,11 @@ pub fn print_dir_size_with_files(
                 let path = entry.path();
 
                 if path.is_file() {
-                    let mut file_name = path.to_str().unwrap().to_string();
+                    let file_name = path.to_str().unwrap().to_string();
+                    let mut file_name_to_display = file_name.clone();
 
                     if file_name.len() > 35 {
-                        file_name = file_name
+                        file_name_to_display = file_name
                             .chars()
                             .rev()
                             .take(30)
@@ -45,12 +43,15 @@ pub fn print_dir_size_with_files(
                             .rev()
                             .collect::<String>();
 
-                        file_name.insert_str(0, "...");
+                        file_name_to_display.insert_str(0, "...");
                     }
 
-                    let file = File::new(file_name, get_file_size(path));
-
-                    files.push(file);
+                    for dir in &args.exclude_dirs {
+                        if !file_name.contains(dir.to_str().unwrap()) {
+                            let file = File::new(file_name_to_display.clone(), get_file_size(path));
+                            files.push(file);
+                        }
+                    }
                 }
             }
 
@@ -106,7 +107,6 @@ pub fn print_dir_size_with_files(
         .set_color_horizontal(Color::FG_MAGENTA)
         .set_color_vertical(Color::FG_MAGENTA);
 
-
     let mut table = Table::new(&files);
 
     table
@@ -115,7 +115,10 @@ pub fn print_dir_size_with_files(
             // make the separator magenta with escape sequences
             format!("\x1b[35m{}\x1b[0m", "-".repeat(table.total_width())),
         ))
-        .with(Panel::footer(format!("\x1b[35m{}\x1b[0m files parsed", file_len)))
+        .with(Panel::footer(format!(
+            "\x1b[35m{}\x1b[0m files parsed",
+            file_len
+        )))
         .with(style);
 
     println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
