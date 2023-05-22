@@ -1,0 +1,76 @@
+use crate::file::File;
+
+use tabled::{
+    settings::{
+        style::{RawStyle, Style},
+        Color, Panel,
+    },
+    Table,
+};
+
+use owo_colors::OwoColorize;
+
+enum TableColor {
+    Magenta,
+    Blue,
+}
+
+fn gen_table_styles(table_color: TableColor) -> RawStyle {
+    let mut style = RawStyle::from(Style::psql());
+
+    let color;
+
+    match table_color {
+        TableColor::Magenta => color = Color::FG_BRIGHT_MAGENTA,
+        TableColor::Blue => color = Color::FG_BRIGHT_BLUE,
+    }
+
+    // I'm sorry Rustaceans
+    style
+        .set_color_top(color.clone())
+        .set_color_bottom(color.clone())
+        .set_color_left(color.clone())
+        .set_color_right(color.clone())
+        .set_color_corner_top_left(color.clone())
+        .set_color_corner_top_right(color.clone())
+        .set_color_corner_bottom_left(color.clone())
+        .set_color_corner_bottom_right(color.clone())
+        .set_color_intersection_bottom(color.clone())
+        .set_color_intersection_top(color.clone())
+        .set_color_intersection_right(color.clone())
+        .set_color_intersection_left(color.clone())
+        .set_color_intersection(color.clone())
+        .set_color_horizontal(color.clone())
+        .set_color_vertical(color.clone());
+
+    style
+}
+
+pub fn print_table_files(files: Vec<File>, files_len: usize) -> () {
+    let style = gen_table_styles(TableColor::Magenta);
+
+    let mut table = Table::new(&files);
+
+    table
+        .with(Panel::horizontal(
+            files.len(),
+            format!("{}", "-".repeat(table.total_width()).magenta()),
+        ))
+        .with(Panel::footer(format!(
+            "{} files parsed",
+            files_len.to_string().magenta()
+        )))
+        .with(style);
+
+    println!("{}", table.to_string().bold());
+}
+
+pub fn print_table_dir(dir_size: File, dir_len: usize) -> () {
+    let mut table = Table::new(&[dir_size]);
+    let style = gen_table_styles(TableColor::Blue);
+
+    let table = table.with(style);
+
+    println!("{}", table.to_string().bold());
+    println!("\n\n{} files parsed", dir_len.to_string().magenta().bold());
+}

@@ -3,17 +3,9 @@ use std::path;
 
 use ignore::WalkBuilder;
 
-use tabled::{
-    settings::{
-        style::{RawStyle, Style},
-        Color, Panel,
-    },
-    Table,
-};
-
+use crate::table::{print_table_dir, print_table_files};
 use crate::utils::get_file_size;
-use crate::Args;
-use crate::{file::File, SortOpt};
+use crate::{file::File, Args, SortOpt};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     clearscreen::clear().unwrap();
@@ -46,10 +38,16 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                         file_name_to_display.insert_str(0, "...");
                     }
 
-                    for dir in &args.exclude_dirs {
-                        if !file_name.contains(dir.to_str().unwrap()) {
-                            let file = File::new(file_name_to_display.clone(), get_file_size(path));
-                            files.push(file);
+                    if args.exclude_dirs.is_empty() {
+                        let file = File::new(file_name_to_display.clone(), get_file_size(path));
+                        files.push(file);
+                    } else {
+                        for dir in &args.exclude_dirs {
+                            if !file_name.contains(dir.to_str().unwrap()) {
+                                let file =
+                                    File::new(file_name_to_display.clone(), get_file_size(path));
+                                files.push(file);
+                            }
                         }
                     }
                 }
@@ -88,44 +86,12 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     let total = File::new("TOTAL SIZE".to_string(), total_size);
     files.push(total);
 
-    let mut style = RawStyle::from(Style::psql());
-
-    style
-        .set_color_top(Color::FG_MAGENTA)
-        .set_color_bottom(Color::FG_MAGENTA)
-        .set_color_left(Color::FG_MAGENTA)
-        .set_color_right(Color::FG_MAGENTA)
-        .set_color_corner_top_left(Color::FG_MAGENTA)
-        .set_color_corner_top_right(Color::FG_MAGENTA)
-        .set_color_corner_bottom_left(Color::FG_MAGENTA)
-        .set_color_corner_bottom_right(Color::FG_MAGENTA)
-        .set_color_intersection_bottom(Color::FG_MAGENTA)
-        .set_color_intersection_top(Color::FG_MAGENTA)
-        .set_color_intersection_right(Color::FG_MAGENTA)
-        .set_color_intersection_left(Color::FG_MAGENTA)
-        .set_color_intersection(Color::FG_MAGENTA)
-        .set_color_horizontal(Color::FG_MAGENTA)
-        .set_color_vertical(Color::FG_MAGENTA);
-
-    let mut table = Table::new(&files);
-
-    table
-        .with(Panel::horizontal(
-            files.len(),
-            // make the separator magenta with escape sequences
-            format!("\x1b[35m{}\x1b[0m", "-".repeat(table.total_width())),
-        ))
-        .with(Panel::footer(format!(
-            "\x1b[35m{}\x1b[0m files parsed",
-            file_len
-        )))
-        .with(style);
-
-    println!("{}", owo_colors::OwoColorize::bold(&table.to_string()));
+    print_table_files(files, file_len);
 }
 
 pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_gitignored: bool) {
     let mut total_size = 0.0;
+    let mut total_files_parsed: usize = 0;
 
     for entry in WalkBuilder::new(&dir_path)
         .hidden(!include_hidden)
@@ -136,6 +102,7 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
             Ok(entry) => {
                 if entry.path().is_file() {
                     total_size += get_file_size(entry.path());
+                    total_files_parsed += 1;
                 }
             }
 
@@ -163,30 +130,6 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
         },
         total_size,
     );
-    let mut table = Table::new(&[dir_size]);
-    let mut style = RawStyle::from(Style::extended());
 
-    style
-        .set_color_top(Color::FG_BRIGHT_BLUE)
-        .set_color_bottom(Color::FG_BRIGHT_BLUE)
-        .set_color_left(Color::FG_BRIGHT_BLUE)
-        .set_color_right(Color::FG_BRIGHT_BLUE)
-        .set_color_corner_top_left(Color::FG_BRIGHT_BLUE)
-        .set_color_corner_top_right(Color::FG_BRIGHT_BLUE)
-        .set_color_corner_bottom_left(Color::FG_BRIGHT_BLUE)
-        .set_color_corner_bottom_right(Color::FG_BRIGHT_BLUE)
-        .set_color_intersection_bottom(Color::FG_BRIGHT_BLUE)
-        .set_color_intersection_top(Color::FG_BRIGHT_BLUE)
-        .set_color_intersection_right(Color::FG_BRIGHT_BLUE)
-        .set_color_intersection_left(Color::FG_BRIGHT_BLUE)
-        .set_color_intersection(Color::FG_BRIGHT_BLUE)
-        .set_color_horizontal(Color::FG_BRIGHT_BLUE)
-        .set_color_vertical(Color::FG_BRIGHT_BLUE);
-
-    table.with(style);
-
-    println!(
-        "{}",
-        owo_colors::OwoColorize::white(&owo_colors::OwoColorize::bold(&table.to_string()))
-    );
+    print_table_dir(dir_size, total_files_parsed);
 }

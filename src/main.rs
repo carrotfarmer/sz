@@ -2,6 +2,7 @@ mod file;
 mod file_size;
 mod utils;
 mod walk_dir;
+mod table;
 
 use clap::Parser;
 use owo_colors::OwoColorize;
