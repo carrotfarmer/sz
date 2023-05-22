@@ -16,7 +16,7 @@ use crate::utils::get_file_size;
 use crate::file::File;
 
 #[derive(Parser, Debug)]
-struct Args {
+pub struct Args {
     /// Path to file or directory
     path: path::PathBuf,
 
@@ -32,9 +32,18 @@ struct Args {
     #[clap(short = 'i', long)]
     include_hidden: bool,
 
-    /// List all files in directory
+    /// List the files in the directory
     #[clap(short = 'l', long)]
+    list_files: bool,
+
+    /// List all files in the directory
+    /// even if directory count exceeds 50
+    #[clap(short = 'L', long)]
     list_all: bool,
+
+    /// Directories to exclude 
+    #[clap(short = 'e', long)]
+    exclude_dirs: Vec<path::PathBuf>,
 
     /// Include gitignored files
     #[clap(short = 'g', long)]
@@ -52,7 +61,7 @@ pub enum SortOpt {
 }
 
 fn main() {
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     if args.path.is_dir() {
         let buf = fs::read_dir(&args.path);
@@ -78,7 +87,7 @@ fn main() {
             }
         }
 
-        if args.list_all {
+        if args.list_files {
             let sort: SortOpt;
 
             if args.sort_files_asc {
@@ -90,11 +99,8 @@ fn main() {
             }
 
             print_dir_size_with_files(
-                args.path,
-                args.include_hidden,
-                args.include_gitignored,
+                &mut args,
                 sort,
-                args.num_files,
             );
         } else {
             print_dir_size(args.path, args.include_hidden, args.include_gitignored);

@@ -11,23 +11,21 @@ use tabled::{
     Table,
 };
 
+use crate::Args;
 use crate::utils::get_file_size;
 use crate::{file::File, SortOpt};
 
 pub fn print_dir_size_with_files(
-    path: path::PathBuf,
-    include_hidden: bool,
-    include_gitignored: bool,
+    args: &mut Args,
     sort_opt: SortOpt,
-    mut num_files: Option<usize>,
 ) {
     clearscreen::clear().unwrap();
 
     let mut files = vec![];
 
-    for result in WalkBuilder::new(&path)
-        .hidden(!include_hidden)
-        .git_ignore(!include_gitignored)
+    for result in WalkBuilder::new(&args.path)
+        .hidden(!&args.include_hidden)
+        .git_ignore(!&args.include_gitignored)
         .build()
     {
         match result {
@@ -68,19 +66,21 @@ pub fn print_dir_size_with_files(
 
     let file_len = files.len();
 
-    if file_len > 50 && num_files.is_none() {
+    if file_len > 50 && args.num_files.is_none() && !args.list_all {
         println!(
             "\x1b[1;33mwarning: {} files found, showing first 20\x1b[0m",
             file_len
         );
-        num_files = Some(20);
+        args.num_files = Some(20);
+    } else {
+        args.num_files = Some(file_len);
     }
 
     let total_size = files
         .iter()
         .fold(0.0, |acc, file| acc + file.clone().bytes());
 
-    if let Some(num_files) = num_files {
+    if let Some(num_files) = args.num_files {
         files.truncate(num_files)
     }
 
