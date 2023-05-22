@@ -4,8 +4,7 @@ mod utils;
 mod walk_dir;
 
 use clap::Parser;
-use file::File;
-use utils::get_file_size;
+use owo_colors::OwoColorize;
 
 use std::fs;
 use std::path;
@@ -13,6 +12,8 @@ use std::path;
 use std::io::ErrorKind;
 
 use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
+use crate::utils::get_file_size;
+use crate::file::File;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -55,6 +56,14 @@ fn main() {
 
     if args.path.is_dir() {
         let buf = fs::read_dir(&args.path);
+
+        if let Some(num) = args.num_files {
+            if num <= 0 || num > 100 {
+                println!("{}", "sz: error: invalid number of files to list".red());
+                println!("{}", "sz: number of files must be between 1 and 100".blue());
+                return;
+            }
+        } 
 
         if let Err(e) = buf {
             match e.kind() {
