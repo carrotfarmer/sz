@@ -42,27 +42,17 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                         }
 
                         if path.parent() == Some(&args.path) {
-                            if args.exclude_dirs.is_empty() {
-                                let (file_size, fc) = get_dir_size(path, args.clone());
-
-                                let dir = Item::new(dir_name_to_display.clone(), file_size);
-
-                                files_count += fc;
-
-                                items.push(dir);
-                            } else {
-                                for dir in &args.exclude_dirs {
-                                    if !dir_name.contains(dir.to_str().unwrap()) {
-                                        let (file_size, fc) = get_dir_size(path, args.clone());
-
-                                        let dir = Item::new(dir_name_to_display.clone(), file_size);
-
-                                        files_count += fc;
-
-                                        items.push(dir);
-                                    }
-                                }
+                            if !args.exclude_dirs.is_empty()
+                                && args.exclude_dirs.contains(&path.to_path_buf())
+                            {
+                                continue;
                             }
+
+                            let (file_size, fc) = get_dir_size(path, args.clone());
+                            let dir = Item::new(dir_name_to_display.clone(), file_size);
+
+                            files_count += fc;
+                            items.push(dir);
                         }
                     }
                 } else if path.is_file() {
@@ -82,24 +72,17 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                         file_name_to_display.insert_str(0, "...");
                     }
 
-                    if args.exclude_dirs.is_empty() {
-                        let file = Item::new(file_name_to_display.clone(), get_file_size(path));
-
-                        files_count += 1;
-
-                        items.push(file);
-                    } else {
-                        for dir in &args.exclude_dirs {
-                            if !file_name.contains(dir.to_str().unwrap()) {
-                                let file =
-                                    Item::new(file_name_to_display.clone(), get_file_size(path));
-
-                                files_count += 1;
-
-                                items.push(file);
-                            }
-                        }
+                    if !args.exclude_dirs.is_empty()
+                        && args.exclude_dirs.contains(&path.parent().unwrap().to_path_buf())
+                    {
+                        continue;
                     }
+
+                    let file = Item::new(file_name_to_display.clone(), get_file_size(path));
+
+                    files_count += 1;
+
+                    items.push(file);
                 }
             }
 

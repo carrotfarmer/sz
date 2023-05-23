@@ -1,9 +1,9 @@
 mod item;
 mod item_size;
+mod sort_opt;
 mod table;
 mod utils;
 mod walk_dir;
-mod sort_opt;
 
 use clap::Parser;
 use owo_colors::OwoColorize;
@@ -14,9 +14,9 @@ use std::path;
 use std::io::ErrorKind;
 
 use crate::item::Item;
+use crate::sort_opt::SortOpt;
 use crate::utils::get_file_size;
 use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
-use crate::sort_opt::SortOpt;
 
 #[derive(Parser, Debug, Clone)]
 pub struct Args {
@@ -44,13 +44,13 @@ pub struct Args {
     #[clap(short = 'L', long)]
     list_all: bool,
 
-    /// Directories to exclude
-    #[clap(short = 'e', long)]
-    exclude_dirs: Vec<path::PathBuf>,
-
     /// Include gitignored files
     #[clap(short = 'g', long)]
     include_gitignored: bool,
+
+    /// Directories to exclude
+    #[clap(short = 'e', long, num_args=1.., value_delimiter=' ')]
+    exclude_dirs: Vec<path::PathBuf>,
 
     /// Number of files to list
     #[clap(short = 'n', long)]
@@ -87,7 +87,7 @@ fn main() {
 
         if args.list_files {
             let sort_opt = SortOpt::from_args(&args);
-            
+
             print_dir_size_with_files(&mut args, sort_opt);
         } else {
             print_dir_size(args.path, args.include_hidden, args.include_gitignored);

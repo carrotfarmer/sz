@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use tabled::Tabled;
 
-#[derive(Tabled, Clone)]
+#[derive(Tabled, Clone, PartialEq)]
 pub struct ItemSize {
     value: f64,
     units: String,

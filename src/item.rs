@@ -11,7 +11,7 @@ use tabled::{
     Table, Tabled,
 };
 
-#[derive(Tabled, Clone)]
+#[derive(Tabled, Clone, PartialEq)]
 pub struct Item {
     #[tabled(rename = "file/dir name")]
     item_name: String,
