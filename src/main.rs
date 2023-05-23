@@ -16,7 +16,7 @@ use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
 use crate::utils::get_file_size;
 use crate::file::File;
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 pub struct Args {
     /// Path to file or directory
     path: path::PathBuf,
@@ -53,6 +53,10 @@ pub struct Args {
     /// Number of files to list
     #[clap(short = 'n', long)]
     num_files: Option<usize>,
+
+    /// Show only directories
+    #[clap(short = 'D', long)]
+    only_dirs: bool,
 }
 
 pub enum SortOpt {

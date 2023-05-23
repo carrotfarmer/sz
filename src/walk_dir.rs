@@ -4,13 +4,13 @@ use std::path;
 use ignore::WalkBuilder;
 
 use crate::table::{print_table_dir, print_table_files};
-use crate::utils::get_file_size;
+use crate::utils::{get_dir_size, get_file_size};
 use crate::{file::File, Args, SortOpt};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     clearscreen::clear().unwrap();
 
-    let mut files = vec![];
+    let mut items = vec![];
 
     for result in WalkBuilder::new(&args.path)
         .hidden(!&args.include_hidden)
@@ -21,7 +21,47 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
             Ok(entry) => {
                 let path = entry.path();
 
-                if path.is_file() {
+                if args.only_dirs {
+                    if path.is_dir() {
+                        let dir_name = path.to_str().unwrap().to_string();
+                        let mut dir_name_to_display = dir_name.clone();
+
+                        if dir_name.len() > 35 {
+                            dir_name_to_display = dir_name
+                                .chars()
+                                .rev()
+                                .take(30)
+                                .collect::<String>()
+                                .chars()
+                                .rev()
+                                .collect::<String>();
+
+                            dir_name_to_display.insert_str(0, "...");
+                        }
+
+                        if path.parent() == Some(&args.path) {
+                            if args.exclude_dirs.is_empty() {
+                                let dir = File::new(
+                                    dir_name_to_display.clone(),
+                                    get_dir_size(path, args.clone()),
+                                );
+
+                                items.push(dir);
+                            } else {
+                                for dir in &args.exclude_dirs {
+                                    if !dir_name.contains(dir.to_str().unwrap()) {
+                                        let dir = File::new(
+                                            dir_name_to_display.clone(),
+                                            get_dir_size(path, args.clone()),
+                                        );
+
+                                        items.push(dir);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if path.is_file() {
                     let file_name = path.to_str().unwrap().to_string();
                     let mut file_name_to_display = file_name.clone();
 
@@ -40,13 +80,15 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
 
                     if args.exclude_dirs.is_empty() {
                         let file = File::new(file_name_to_display.clone(), get_file_size(path));
-                        files.push(file);
+
+                        items.push(file);
                     } else {
                         for dir in &args.exclude_dirs {
                             if !file_name.contains(dir.to_str().unwrap()) {
                                 let file =
                                     File::new(file_name_to_display.clone(), get_file_size(path));
-                                files.push(file);
+
+                                items.push(file);
                             }
                         }
                     }
@@ -58,35 +100,35 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     }
 
     match sort_opt {
-        SortOpt::Asc => files.sort_by(|a, b| a.bytes().partial_cmp(&b.bytes()).unwrap()),
-        SortOpt::Desc => files.sort_by(|a, b| b.bytes().partial_cmp(&a.bytes()).unwrap()),
+        SortOpt::Asc => items.sort_by(|a, b| a.bytes().partial_cmp(&b.bytes()).unwrap()),
+        SortOpt::Desc => items.sort_by(|a, b| b.bytes().partial_cmp(&a.bytes()).unwrap()),
         _ => (),
     }
 
-    let file_len = files.len();
+    let item_len = items.len();
 
-    if file_len > 50 && args.num_files.is_none() && !args.list_all {
+    if item_len > 50 && args.num_files.is_none() && !args.list_all {
         println!(
-            "\x1b[1;33mwarning: {} files found, showing first 20\x1b[0m",
-            file_len
+            "\x1b[1;33mwarning: {} items found, showing first 20\x1b[0m",
+            item_len
         );
         args.num_files = Some(20);
     } else {
-        args.num_files = Some(file_len);
+        args.num_files = Some(item_len);
     }
 
-    let total_size = files
+    let total_size = items
         .iter()
-        .fold(0.0, |acc, file| acc + file.clone().bytes());
+        .fold(0.0, |acc, item| acc + item.clone().bytes());
 
     if let Some(num_files) = args.num_files {
-        files.truncate(num_files)
+        items.truncate(num_files)
     }
 
     let total = File::new("TOTAL SIZE".to_string(), total_size);
-    files.push(total);
+    items.push(total);
 
-    print_table_files(files, file_len);
+    print_table_files(items, item_len);
 }
 
 pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_gitignored: bool) {
