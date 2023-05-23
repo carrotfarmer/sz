@@ -1,15 +1,9 @@
 use std::fmt::Display;
 
-use crate::item_size::ItemSize;
+use crate::{item_size::ItemSize, table::print_table_item};
 
 use owo_colors::OwoColorize;
-use tabled::{
-    settings::{
-        style::{RawStyle, Style},
-        Color,
-    },
-    Table, Tabled,
-};
+use tabled::Tabled;
 
 #[derive(Tabled, Clone, PartialEq)]
 pub struct Item {
@@ -18,7 +12,7 @@ pub struct Item {
 
     #[tabled(rename = "size")]
     item_size: ItemSize,
-    
+
     #[tabled(skip)]
     bytes: f64,
 }
@@ -49,28 +43,7 @@ impl Item {
 
 impl Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut style = RawStyle::from(Style::extended());
-
-        style
-            .set_color_top(Color::FG_BLUE)
-            .set_color_bottom(Color::FG_BLUE)
-            .set_color_left(Color::FG_BLUE)
-            .set_color_right(Color::FG_BLUE)
-            .set_color_corner_top_left(Color::FG_BLUE)
-            .set_color_corner_top_right(Color::FG_BLUE)
-            .set_color_corner_bottom_left(Color::FG_BLUE)
-            .set_color_corner_bottom_right(Color::FG_BLUE)
-            .set_color_intersection_bottom(Color::FG_BLUE)
-            .set_color_intersection_top(Color::FG_BLUE)
-            .set_color_intersection_right(Color::FG_BLUE)
-            .set_color_intersection_left(Color::FG_BLUE)
-            .set_color_intersection(Color::FG_BLUE)
-            .set_color_horizontal(Color::FG_BLUE)
-            .set_color_vertical(Color::FG_BLUE);
-
-        let mut table = Table::new(&[self]);
-
-        table.with(style);
+        let table = print_table_item(self);
         write!(f, "{}", table.bold())?;
 
         Ok(())

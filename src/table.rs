@@ -78,3 +78,11 @@ pub fn print_table_dir(dir_size: Item, dir_len: usize) -> () {
     println!("{}", table.to_string().bold());
     println!("\n\n{} files parsed", dir_len.to_string().magenta().bold());
 }
+
+pub fn print_table_item(item: &Item) -> Table {
+    let mut table = Table::new(&[item]);
+    let style = gen_table_styles(TableColor::Blue);
+
+    table.with(style);
+    table
+}
