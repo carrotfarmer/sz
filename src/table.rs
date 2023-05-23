@@ -15,15 +15,19 @@ enum TableColor {
     Blue,
 }
 
+impl TableColor {
+    fn to_color(&self) -> Color {
+        match self {
+            TableColor::Magenta => Color::FG_BRIGHT_MAGENTA,
+            TableColor::Blue => Color::FG_BRIGHT_BLUE,
+        }
+    }
+}
+
 fn gen_table_styles(table_color: TableColor) -> RawStyle {
     let mut style = RawStyle::from(Style::psql());
 
-    let color;
-
-    match table_color {
-        TableColor::Magenta => color = Color::FG_BRIGHT_MAGENTA,
-        TableColor::Blue => color = Color::FG_BRIGHT_BLUE,
-    }
+    let color = table_color.to_color();
 
     // I'm sorry Rustaceans
     style

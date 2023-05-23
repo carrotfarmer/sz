@@ -1,8 +1,9 @@
 mod item;
 mod item_size;
+mod table;
 mod utils;
 mod walk_dir;
-mod table;
+mod sort_opt;
 
 use clap::Parser;
 use owo_colors::OwoColorize;
@@ -12,9 +13,10 @@ use std::path;
 
 use std::io::ErrorKind;
 
-use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
-use crate::utils::get_file_size;
 use crate::item::Item;
+use crate::utils::get_file_size;
+use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
+use crate::sort_opt::SortOpt;
 
 #[derive(Parser, Debug, Clone)]
 pub struct Args {
@@ -42,7 +44,7 @@ pub struct Args {
     #[clap(short = 'L', long)]
     list_all: bool,
 
-    /// Directories to exclude 
+    /// Directories to exclude
     #[clap(short = 'e', long)]
     exclude_dirs: Vec<path::PathBuf>,
 
@@ -59,26 +61,17 @@ pub struct Args {
     only_dirs: bool,
 }
 
-pub enum SortOpt {
-    Asc,
-    Desc,
-    Def,
-}
-
 fn main() {
     let mut args = Args::parse();
-
     if args.path.is_dir() {
         let buf = fs::read_dir(&args.path);
-
         if let Some(num) = args.num_files {
             if num <= 0 || num > 100 {
                 println!("{}", "sz: error: invalid number of files to list".red());
                 println!("{}", "sz: number of files must be between 1 and 100".blue());
                 return;
             }
-        } 
-
+        }
         if let Err(e) = buf {
             match e.kind() {
                 ErrorKind::NotFound => {
@@ -93,20 +86,9 @@ fn main() {
         }
 
         if args.list_files {
-            let sort: SortOpt;
-
-            if args.sort_files_asc {
-                sort = SortOpt::Asc;
-            } else if args.sort_files_desc {
-                sort = SortOpt::Desc;
-            } else {
-                sort = SortOpt::Def;
-            }
-
-            print_dir_size_with_files(
-                &mut args,
-                sort,
-            );
+            let sort_opt = SortOpt::from_args(&args);
+            
+            print_dir_size_with_files(&mut args, sort_opt);
         } else {
             print_dir_size(args.path, args.include_hidden, args.include_gitignored);
         }
