@@ -14,8 +14,9 @@ pub fn get_file_size(path: &Path) -> f64 {
     }
 }
 
-pub fn get_dir_size(path: &Path, args: Args) -> f64 {
+pub fn get_dir_size(path: &Path, args: Args) -> (f64, usize) {
     let mut dir_size: f64 = 0.0;
+    let mut files_count = 0;
 
     for item in WalkBuilder::new(path)
         .hidden(!args.include_hidden)
@@ -26,6 +27,7 @@ pub fn get_dir_size(path: &Path, args: Args) -> f64 {
             Ok(item) => {
                 if item.path().is_file() {
                     dir_size += get_file_size(item.path());
+                    files_count += 1;
                 }
             }
 
@@ -33,5 +35,5 @@ pub fn get_dir_size(path: &Path, args: Args) -> f64 {
         }
     }
 
-    dir_size
+    (dir_size, files_count)
 }
