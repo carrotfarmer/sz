@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::file_size::FileSize;
+use crate::item_size::ItemSize;
 
 use owo_colors::OwoColorize;
 use tabled::{
@@ -12,34 +12,34 @@ use tabled::{
 };
 
 #[derive(Tabled, Clone)]
-pub struct File {
+pub struct Item {
     #[tabled(rename = "file/dir name")]
-    file_name: String,
+    item_name: String,
 
     #[tabled(rename = "size")]
-    file_size: FileSize,
+    item_size: ItemSize,
     
     #[tabled(skip)]
     bytes: f64,
 }
 
-impl File {
-    pub fn new(file_name: String, file_size_bytes: f64) -> Self {
-        let file_size = FileSize::new(file_size_bytes);
+impl Item {
+    pub fn new(item_name: String, item_size_bytes: f64) -> Self {
+        let item_size = ItemSize::new(item_size_bytes);
 
         Self {
-            file_name,
-            file_size,
-            bytes: file_size_bytes,
+            item_name,
+            item_size,
+            bytes: item_size_bytes,
         }
     }
 
-    pub fn file_name(self) -> String {
-        self.file_name
+    pub fn item_name(self) -> String {
+        self.item_name
     }
 
-    pub fn file_size(self) -> FileSize {
-        self.file_size
+    pub fn item_size(self) -> ItemSize {
+        self.item_size
     }
 
     pub fn bytes(&self) -> f64 {
@@ -47,7 +47,7 @@ impl File {
     }
 }
 
-impl Display for File {
+impl Display for Item {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut style = RawStyle::from(Style::extended());
 

@@ -1,4 +1,4 @@
-use crate::file::File;
+use crate::item::Item;
 
 use tabled::{
     settings::{
@@ -46,7 +46,7 @@ fn gen_table_styles(table_color: TableColor) -> RawStyle {
     style
 }
 
-pub fn print_table_files(files: Vec<File>, files_len: usize) -> () {
+pub fn print_table_files(files: Vec<Item>, files_len: usize) -> () {
     let style = gen_table_styles(TableColor::Magenta);
 
     let mut table = Table::new(&files);
@@ -65,7 +65,7 @@ pub fn print_table_files(files: Vec<File>, files_len: usize) -> () {
     println!("{}", table.to_string().bold());
 }
 
-pub fn print_table_dir(dir_size: File, dir_len: usize) -> () {
+pub fn print_table_dir(dir_size: Item, dir_len: usize) -> () {
     let mut table = Table::new(&[dir_size]);
     let style = gen_table_styles(TableColor::Blue);
 

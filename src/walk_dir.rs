@@ -5,7 +5,7 @@ use ignore::WalkBuilder;
 
 use crate::table::{print_table_dir, print_table_files};
 use crate::utils::{get_dir_size, get_file_size};
-use crate::{file::File, Args, SortOpt};
+use crate::{item::Item, Args, SortOpt};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     clearscreen::clear().unwrap();
@@ -41,7 +41,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
 
                         if path.parent() == Some(&args.path) {
                             if args.exclude_dirs.is_empty() {
-                                let dir = File::new(
+                                let dir = Item::new(
                                     dir_name_to_display.clone(),
                                     get_dir_size(path, args.clone()),
                                 );
@@ -50,7 +50,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                             } else {
                                 for dir in &args.exclude_dirs {
                                     if !dir_name.contains(dir.to_str().unwrap()) {
-                                        let dir = File::new(
+                                        let dir = Item::new(
                                             dir_name_to_display.clone(),
                                             get_dir_size(path, args.clone()),
                                         );
@@ -79,14 +79,14 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                     }
 
                     if args.exclude_dirs.is_empty() {
-                        let file = File::new(file_name_to_display.clone(), get_file_size(path));
+                        let file = Item::new(file_name_to_display.clone(), get_file_size(path));
 
                         items.push(file);
                     } else {
                         for dir in &args.exclude_dirs {
                             if !file_name.contains(dir.to_str().unwrap()) {
                                 let file =
-                                    File::new(file_name_to_display.clone(), get_file_size(path));
+                                    Item::new(file_name_to_display.clone(), get_file_size(path));
 
                                 items.push(file);
                             }
@@ -125,7 +125,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
         items.truncate(num_files)
     }
 
-    let total = File::new("TOTAL SIZE".to_string(), total_size);
+    let total = Item::new("TOTAL SIZE".to_string(), total_size);
     items.push(total);
 
     print_table_files(items, item_len);
@@ -152,7 +152,7 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
         }
     }
 
-    let dir_size = File::new(
+    let dir_size = Item::new(
         if let Some(_) = dir_path.file_name() {
             fs::canonicalize(dir_path)
                 .unwrap()

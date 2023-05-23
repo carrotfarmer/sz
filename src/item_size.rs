@@ -3,12 +3,12 @@ use std::fmt::Display;
 use tabled::Tabled;
 
 #[derive(Tabled, Clone)]
-pub struct FileSize {
+pub struct ItemSize {
     value: f64,
     units: String,
 }
 
-impl FileSize {
+impl ItemSize {
     pub fn new(value: f64) -> Self {
         let (mut val, mut un) = (value, String::from(""));
 
@@ -59,7 +59,7 @@ impl FileSize {
     }
 }
 
-impl Display for FileSize {
+impl Display for ItemSize {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:.2}{}", self.value, self.units)
     }

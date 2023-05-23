@@ -1,5 +1,5 @@
-mod file;
-mod file_size;
+mod item;
+mod item_size;
 mod utils;
 mod walk_dir;
 mod table;
@@ -14,7 +14,7 @@ use std::io::ErrorKind;
 
 use crate::walk_dir::{print_dir_size, print_dir_size_with_files};
 use crate::utils::get_file_size;
-use crate::file::File;
+use crate::item::Item;
 
 #[derive(Parser, Debug, Clone)]
 pub struct Args {
@@ -111,7 +111,7 @@ fn main() {
             print_dir_size(args.path, args.include_hidden, args.include_gitignored);
         }
     } else {
-        let file = File::new(
+        let file = Item::new(
             String::from(args.path.file_name().unwrap().to_str().unwrap()),
             get_file_size(args.path.as_path()),
         );
