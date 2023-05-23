@@ -5,7 +5,7 @@ use ignore::WalkBuilder;
 
 use crate::sort_opt::SortOpt;
 use crate::table::{print_table_dir, print_table_files};
-use crate::utils::{get_dir_size, get_file_size};
+use crate::utils::{get_dir_size, get_file_size, shorten_name};
 use crate::{item::Item, Args};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
@@ -26,20 +26,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                 if args.only_dirs {
                     if path.is_dir() {
                         let dir_name = path.to_str().unwrap().to_string();
-                        let mut dir_name_to_display = dir_name.clone();
-
-                        if dir_name.len() > 35 {
-                            dir_name_to_display = dir_name
-                                .chars()
-                                .rev()
-                                .take(30)
-                                .collect::<String>()
-                                .chars()
-                                .rev()
-                                .collect::<String>();
-
-                            dir_name_to_display.insert_str(0, "...");
-                        }
+                        let dir_name_to_display = shorten_name(dir_name.clone());
 
                         if path.parent() == Some(&args.path) {
                             if !args.exclude_dirs.is_empty()
@@ -57,23 +44,12 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                     }
                 } else if path.is_file() {
                     let file_name = path.to_str().unwrap().to_string();
-                    let mut file_name_to_display = file_name.clone();
-
-                    if file_name.len() > 35 {
-                        file_name_to_display = file_name
-                            .chars()
-                            .rev()
-                            .take(30)
-                            .collect::<String>()
-                            .chars()
-                            .rev()
-                            .collect::<String>();
-
-                        file_name_to_display.insert_str(0, "...");
-                    }
+                    let file_name_to_display = shorten_name(file_name.clone());
 
                     if !args.exclude_dirs.is_empty()
-                        && args.exclude_dirs.contains(&path.parent().unwrap().to_path_buf())
+                        && args
+                            .exclude_dirs
+                            .contains(&path.parent().unwrap().to_path_buf())
                     {
                         continue;
                     }

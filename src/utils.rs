@@ -37,3 +37,22 @@ pub fn get_dir_size(path: &Path, args: Args) -> (f64, usize) {
 
     (dir_size, files_count)
 }
+
+pub fn shorten_name(item_name: String) -> String {
+    if item_name.len() > 35 {
+        let mut s = item_name 
+            .chars()
+            .rev()
+            .take(30)
+            .collect::<String>()
+            .chars()
+            .rev()
+            .collect::<String>();
+
+        s.insert_str(0, "...");
+
+        return s;
+    }
+
+    item_name
+}
