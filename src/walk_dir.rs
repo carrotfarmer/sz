@@ -9,7 +9,10 @@ use crate::utils::{get_dir_size, get_file_size, shorten_name};
 use crate::{item::Item, Args};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
-    clearscreen::clear().unwrap();
+    match clearscreen::clear() {
+        Ok(_) => {}
+        Err(e) => println!("sz: error while clearing screen: {}", e),
+    }
 
     let mut items = vec![];
     let mut files_count = 0;
@@ -55,9 +58,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                     }
 
                     let file = Item::new(file_name_to_display.clone(), get_file_size(path));
-
                     files_count += 1;
-
                     items.push(file);
                 }
             }
@@ -67,7 +68,6 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     }
 
     sort_opt.sort_items(&mut items);
-
     let item_len = items.len();
 
     if item_len > 50 && args.num_files.is_none() && !args.list_all {
