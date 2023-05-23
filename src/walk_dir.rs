@@ -149,13 +149,7 @@ pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_git
                 .unwrap()
                 .to_string()
         } else {
-            fs::canonicalize(dir_path)
-                .unwrap()
-                .file_name()
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_string()
+            dir_path.to_str().unwrap().to_string()
         },
         total_size,
     );
