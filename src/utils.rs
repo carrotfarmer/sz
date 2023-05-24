@@ -1,5 +1,5 @@
-use std::path::Path;
 use std::io;
+use std::path::Path;
 
 use ignore::WalkBuilder;
 
@@ -47,6 +47,28 @@ pub fn get_file_lines(path: &Path) -> usize {
             0
         }
     }
+}
+
+pub fn get_dir_lines(path: &Path, args: Args) -> usize {
+    let mut lines = 0;
+
+    for item in WalkBuilder::new(path)
+        .hidden(!args.include_hidden)
+        .git_exclude(!args.include_gitignored)
+        .build()
+    {
+        match item {
+            Ok(item) => {
+                if item.path().is_file() {
+                    lines += get_file_lines(item.path());
+                }
+            },
+
+            Err(e) => println!("sz: error while reading path: {}", e)
+        }
+    }
+
+    lines
 }
 
 pub fn shorten_name(item_name: String) -> String {

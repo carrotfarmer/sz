@@ -5,7 +5,7 @@ use ignore::WalkBuilder;
 
 use crate::sort_opt::SortOpt;
 use crate::table::{print_table_dir, print_table_files};
-use crate::utils::{get_dir_size, get_file_size, get_file_lines, shorten_name, user_confirmation};
+use crate::utils::{get_dir_size, get_file_size, get_file_lines, get_dir_lines, shorten_name, user_confirmation};
 use crate::{item::Item, Args};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
@@ -45,7 +45,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                             }
 
                             if args.show_lines {
-                                lines += get_file_lines(path)
+                                lines += get_dir_lines(path, args.clone())
                             }
 
                             let (file_size, fc) = get_dir_size(path, args.clone());
