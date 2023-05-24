@@ -71,38 +71,38 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     sort_opt.sort_items(&mut items);
     let item_len = items.len();
 
-    if item_len > 50 && args.num_files.is_none() && !args.list_all {
-        println!(
-            "\x1b[1;33mwarning: {} items found, showing first 20\x1b[0m",
-            item_len
-        );
-
-        args.num_files = Some(20);
-    } else if args.list_all {
-        if item_len > 50 {
-            let msg = format!(
-                "\x1b[1;33mwarning: {} items found, proceed? [y/n]\x1b[0m",
+    if args.num_files == None {
+        if item_len > 50 && args.num_files.is_none() && !args.list_all {
+            println!(
+                "\x1b[1;33mwarning: {} items found, showing first 20\x1b[0m",
                 item_len
             );
 
-            let confirmation = user_confirmation(msg);
+            args.num_files = Some(20);
+        } else if args.list_all {
+            if item_len > 50 {
+                let msg = format!(
+                    "\x1b[1;33mwarning: {} items found, proceed? [y/n]\x1b[0m",
+                    item_len
+                );
 
-            match confirmation {
-                Some(val) => {
-                    match val {
+                let confirmation = user_confirmation(msg);
+
+                match confirmation {
+                    Some(val) => match val {
                         true => args.num_files = Some(item_len),
                         false => args.num_files = Some(50),
-                    }
-                },
+                    },
 
-                None => {
-                    println!("sz: invalid input");
-                    std::process::exit(1);
+                    None => {
+                        println!("sz: invalid input");
+                        std::process::exit(1);
+                    }
                 }
             }
+        } else {
+            args.num_files = Some(item_len);
         }
-    } else {
-        args.num_files = Some(item_len);
     }
 
     let total_size = items
