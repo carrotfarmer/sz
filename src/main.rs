@@ -23,11 +23,11 @@ pub struct Args {
     /// Path to file or directory
     path: path::PathBuf,
 
-    /// Sort files by size in descending order (with -l flag)
+    /// Sort items by size in descending order 
     #[clap(short = 'd', long)]
     sort_files_desc: bool,
 
-    /// Sort files by size in ascending order (with -l flag)
+    /// Sort items by size in ascending order
     #[clap(short = 'a', long)]
     sort_files_asc: bool,
 
