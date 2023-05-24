@@ -126,6 +126,12 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
         items.truncate(num_files)
     }
 
+    if items.is_empty() {
+        println!("\x1b[1;33mwarning: no items found\x1b[0m\n");
+    }
+
+    items.push(Item::new("<>".to_string(), 0.0));
+
     let total = Item::new("TOTAL SIZE".to_string(), total_size);
     items.push(total);
 
