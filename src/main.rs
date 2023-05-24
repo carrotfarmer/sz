@@ -59,6 +59,11 @@ pub struct Args {
     /// Show only directories
     #[clap(short = 'D', long)]
     only_dirs: bool,
+
+    /// Recursively list directories
+    /// Only to be used with -D flag 
+    #[clap(short = 'R', long)]
+    recursive_dirs: bool
 }
 
 fn main() {

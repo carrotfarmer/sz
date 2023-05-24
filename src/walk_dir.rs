@@ -27,12 +27,17 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
             Ok(entry) => {
                 let path = entry.path();
 
+                let condition = match args.recursive_dirs {
+                    true => &args.path != path && path.is_dir(),
+                    false => path.parent() == Some(&args.path),
+                };
+
                 if args.only_dirs {
                     if path.is_dir() {
                         let dir_name = path.to_str().unwrap().to_string();
                         let dir_name_to_display = shorten_name(dir_name.clone());
 
-                        if path.parent() == Some(&args.path) {
+                        if condition {
                             if !args.exclude_dirs.is_empty()
                                 && args.exclude_dirs.contains(&path.to_path_buf())
                             {
