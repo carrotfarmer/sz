@@ -85,7 +85,7 @@ fn main() {
             }
         }
 
-        if args.list_files {
+        if args.list_files || args.list_all {
             let sort_opt = SortOpt::from_args(&args);
 
             print_dir_size_with_files(&mut args, sort_opt);
