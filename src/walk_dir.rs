@@ -5,8 +5,7 @@ use ignore::WalkBuilder;
 
 use crate::sort_opt::SortOpt;
 use crate::table::{print_table_dir, print_table_files};
-use crate::utils::user_confirmation;
-use crate::utils::{get_dir_size, get_file_size, shorten_name};
+use crate::utils::{get_dir_size, get_file_size, get_file_lines, shorten_name, user_confirmation};
 use crate::{item::Item, Args};
 
 pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
@@ -17,6 +16,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
 
     let mut items = vec![];
     let mut files_count = 0;
+    let mut lines = 0;
 
     for result in WalkBuilder::new(&args.path)
         .hidden(!&args.include_hidden)
@@ -44,6 +44,10 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                                 continue;
                             }
 
+                            if args.show_lines {
+                                lines += get_file_lines(path)
+                            }
+
                             let (file_size, fc) = get_dir_size(path, args.clone());
                             let dir = Item::new(dir_name_to_display.clone(), file_size);
 
@@ -61,6 +65,10 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                             .contains(&path.parent().unwrap().to_path_buf())
                     {
                         continue;
+                    }
+
+                    if args.show_lines {
+                        lines += get_file_lines(path)
                     }
 
                     let file = Item::new(file_name_to_display.clone(), get_file_size(path));
@@ -122,6 +130,10 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     items.push(total);
 
     print_table_files(items, files_count);
+
+    if args.show_lines {
+        println!("\n\x1b[1;33mTotal lines: {}\x1b[0m", lines);
+    }
 }
 
 pub fn print_dir_size(dir_path: path::PathBuf, include_hidden: bool, include_gitignored: bool) {

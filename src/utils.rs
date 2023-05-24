@@ -39,6 +39,16 @@ pub fn get_dir_size(path: &Path, args: Args) -> (f64, usize) {
     (dir_size, files_count)
 }
 
+pub fn get_file_lines(path: &Path) -> usize {
+    match std::fs::read_to_string(path) {
+        Ok(content) => content.lines().count(),
+        Err(e) => {
+            println!("sz: error while reading path: {}", e);
+            0
+        }
+    }
+}
+
 pub fn shorten_name(item_name: String) -> String {
     if item_name.len() > 35 {
         let mut s = item_name

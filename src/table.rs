@@ -69,6 +69,27 @@ pub fn print_table_files(files: Vec<Item>, files_len: usize) -> () {
     println!("{}", table.to_string().bold());
 }
 
+pub fn print_table_files_with_lines(files: Vec<Item>, files_len: usize) -> () {
+    let style = gen_table_styles(TableColor::Magenta);
+
+    let mut table = Table::new(&files);
+
+    table
+        .with(Panel::horizontal(
+            files.len(),
+            format!("{}", "-".repeat(table.total_width()).magenta()),
+        ))
+        .with(Panel::footer(format!(
+            "{} files parsed",
+            files_len.to_string().magenta()
+        )))
+        .with(style);
+
+    println!("{}", table.to_string().bold());
+}
+
+
+
 pub fn print_table_dir(dir_size: Item, dir_len: usize) -> () {
     let mut table = Table::new(&[dir_size]);
     let style = gen_table_styles(TableColor::Blue);

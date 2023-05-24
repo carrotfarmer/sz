@@ -63,7 +63,11 @@ pub struct Args {
     /// Recursively list directories
     /// Only to be used with -D flag 
     #[clap(short = 'R', long)]
-    recursive_dirs: bool
+    recursive_dirs: bool,
+
+    /// Show lines for items
+    #[clap(short = 's', long)]
+    show_lines: bool,
 }
 
 fn main() {
