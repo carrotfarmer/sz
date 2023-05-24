@@ -5,6 +5,7 @@ use ignore::WalkBuilder;
 
 use crate::sort_opt::SortOpt;
 use crate::table::{print_table_dir, print_table_files};
+use crate::utils::user_confirmation;
 use crate::utils::{get_dir_size, get_file_size, shorten_name};
 use crate::{item::Item, Args};
 
@@ -75,7 +76,31 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
             "\x1b[1;33mwarning: {} items found, showing first 20\x1b[0m",
             item_len
         );
+
         args.num_files = Some(20);
+    } else if args.list_all {
+        if item_len > 50 {
+            let msg = format!(
+                "\x1b[1;33mwarning: {} items found, proceed? [y/n]\x1b[0m",
+                item_len
+            );
+
+            let confirmation = user_confirmation(msg);
+
+            match confirmation {
+                Some(val) => {
+                    match val {
+                        true => args.num_files = Some(item_len),
+                        false => args.num_files = Some(50),
+                    }
+                },
+
+                None => {
+                    println!("sz: invalid input");
+                    std::process::exit(1);
+                }
+            }
+        }
     } else {
         args.num_files = Some(item_len);
     }

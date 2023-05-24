@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::io;
 
 use ignore::WalkBuilder;
 
@@ -40,7 +41,7 @@ pub fn get_dir_size(path: &Path, args: Args) -> (f64, usize) {
 
 pub fn shorten_name(item_name: String) -> String {
     if item_name.len() > 35 {
-        let mut s = item_name 
+        let mut s = item_name
             .chars()
             .rev()
             .take(30)
@@ -55,4 +56,20 @@ pub fn shorten_name(item_name: String) -> String {
     }
 
     item_name
+}
+
+pub fn user_confirmation(message: String) -> Option<bool> {
+    println!("{}", message);
+
+    let mut proceed = String::from("");
+
+    io::stdin()
+        .read_line(&mut proceed)
+        .expect("sz: error while reading input");
+
+    match proceed.as_str() {
+        "y\n" => Some(true),
+        "n\n" => Some(false),
+        _ => None,
+    }
 }
