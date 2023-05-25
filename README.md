@@ -2,7 +2,7 @@
 A pragmatic way to view your file sizes. Think of it as an easier-to-use and more intuitive alternative to the
 [du](https://www.gnu.org/software/coreutils/manual/html_node/du-invocation.html#du-invocation) coreutil.
 
-This project is still under development and might contains bugs and crappy code! Please open issues/PRs if you find something janky.
+This project is still under development and might contain bugs and crappy code! Please open issues/PRs if you find something janky.
 
 ## usage 
 
