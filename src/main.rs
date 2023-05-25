@@ -99,7 +99,7 @@ fn main() {
 
             print_dir_size_with_files(&mut args, sort_opt);
         } else {
-            print_dir_size(args.path, args.include_hidden, args.include_gitignored);
+            print_dir_size(args);
         }
     } else {
         let file = Item::new(

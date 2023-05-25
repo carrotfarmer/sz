@@ -163,8 +163,8 @@ pub fn print_dir_size(args: Args) {
     }
 
     let dir_size = Item::new(
-        if let Some(_) = &args.path.file_name() {
-            fs::canonicalize(&args.path)
+        if let Some(_) = dir_path.file_name() {
+            fs::canonicalize(dir_path)
                 .unwrap()
                 .file_name()
                 .unwrap()
@@ -172,7 +172,7 @@ pub fn print_dir_size(args: Args) {
                 .unwrap()
                 .to_string()
         } else {
-             fs::canonicalize(&args.path)
+             fs::canonicalize(dir_path)
                 .unwrap()
                 .file_name()
                 .unwrap()
@@ -184,9 +184,6 @@ pub fn print_dir_size(args: Args) {
     );
 
     print_table_dir(dir_size, total_files_parsed);
-    let lines = get_dir_lines(&args.path, args.clone());
 
-    if args.show_lines {
-        println!("\x1b[1;33mTotal lines: {}\x1b[0m", lines);
-    }
+    if 
 }
