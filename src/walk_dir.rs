@@ -184,9 +184,9 @@ pub fn print_dir_size(args: Args) {
     );
 
     print_table_dir(dir_size, total_files_parsed);
-    let lines = get_dir_lines(&args.path, args.clone());
 
     if args.show_lines {
+        let lines = get_dir_lines(&args.path, args.clone());
         println!("\x1b[1;33mTotal lines: {}\x1b[0m", lines);
     }
 }
