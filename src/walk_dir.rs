@@ -153,6 +153,14 @@ pub fn print_dir_size(args: Args) {
         match entry {
             Ok(entry) => {
                 if entry.path().is_file() {
+                    if !args.exclude_dirs.is_empty()
+                        && args
+                            .exclude_dirs
+                            .contains(&entry.path().parent().unwrap().to_path_buf())
+                    {
+                        continue;
+                    }
+
                     total_size += get_file_size(entry.path());
                     total_files_parsed += 1;
                 }
