@@ -50,10 +50,17 @@ fn gen_table_styles(table_color: TableColor) -> RawStyle {
     style
 }
 
-pub fn print_table_files(files: Vec<Item>, files_len: usize) -> () {
+pub fn print_table_files(files: Vec<Item>, items_len: usize, is_dir: bool) -> () {
     let style = gen_table_styles(TableColor::Magenta);
 
     let mut table = Table::new(&files);
+
+    let msg;
+
+    match is_dir {
+        true => msg = format!("{} dirs parsed", items_len.to_string().magenta()),
+        false => msg = format!("{} files parsed", items_len.to_string().magenta()),
+    }
 
     table
         .with(Panel::horizontal(
@@ -61,8 +68,8 @@ pub fn print_table_files(files: Vec<Item>, files_len: usize) -> () {
             format!("{}", "-".repeat(table.total_width()).magenta()),
         ))
         .with(Panel::footer(format!(
-            "{} files parsed",
-            files_len.to_string().magenta()
+            "{}",
+            msg
         )))
         .with(style);
 

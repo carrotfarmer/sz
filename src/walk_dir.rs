@@ -16,6 +16,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
 
     let mut items = vec![];
     let mut files_count = 0;
+    let mut dir_count = 0; 
     let mut lines = 0;
 
     for result in WalkBuilder::new(&args.path)
@@ -33,6 +34,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                 };
 
                 if args.only_dirs {
+
                     if path.is_dir() {
                         let dir_name = path.to_str().unwrap().to_string();
                         let dir_name_to_display = shorten_name(dir_name.clone());
@@ -51,7 +53,7 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
                             let (file_size, fc) = get_dir_size(path, args.clone());
                             let dir = Item::new(dir_name_to_display.clone(), file_size);
 
-                            files_count += fc;
+                            dir_count += 1;
                             items.push(dir);
                         }
                     }
@@ -134,7 +136,11 @@ pub fn print_dir_size_with_files(args: &mut Args, sort_opt: SortOpt) {
     let total = Item::new("TOTAL SIZE".to_string(), total_size);
     items.push(total);
 
-    print_table_files(items, files_count);
+    if args.only_dirs {
+        files_count = dir_count;
+    }
+
+    print_table_files(items, files_count, args.only_dirs);
 
     if args.show_lines {
         println!("\n\x1b[1;33mTotal lines: {}\x1b[0m", lines);
