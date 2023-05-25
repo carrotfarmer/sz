@@ -2,13 +2,15 @@
 A pragmatic way to view your file sizes. Think of it as an easier-to-use and more intuitive alternative to the
 [du](https://www.gnu.org/software/coreutils/manual/html_node/du-invocation.html#du-invocation) coreutil.
 
+This project is still under development and might contains bugs and crappy code! Please open issues/PRs if you find something janky.
+
 ## usage 
 
 Let's take a look at how we can use this utility in a directory.
 
 - to find the size of the current directory (excluding gitignored and hidden files/files in gitignored or hidden directories)
 
-```
+```bash
 sz . 
 ```
 
@@ -16,7 +18,7 @@ this will be the output:
 
 ![ss1](https://i.imgur.com/ZZYI9ji.png)
 
-```
+```bash
  file/dir name | size    
 ---------------+---------
  sz            | 41.52KB 
@@ -27,7 +29,7 @@ this will be the output:
 
 - if you want to list the size of each file along with the file path:
 
-```
+```bash
 sz . -l
 ```
 
@@ -35,7 +37,7 @@ sz . -l
 
 - you can include gitignored and hidden flags by including the `-g` and `-i` flag respectively.
 
-```
+```bash
 sz . -l -i -g
 ```
 
@@ -46,23 +48,23 @@ sz . -l -i -g
   you can either provide the number of items you want to list with the `-n` argument or include the
   `-L` flag to list all the items.
 
-```
+```bash
 sz . -l -i -g -n 30 # show me the first 30 items
 ```
 
-```
+```bash
 sz . -l -i -g -L # show me all the files
 ```
 
 - you can also sort the items based on size using the `-d` and `-a` flags.
 
-```
+```bash
 sz . -l -d -n 5 # returns the 5 largest files in the current directory
 ```
 
 ![ss5](https://i.imgur.com/eLrjAUN.png)
 
-```
+```bash
 sz . -l -a -n 6 # returns the 6 smallest files in the current directory
 ```
 
@@ -72,7 +74,7 @@ sz . -l -a -n 6 # returns the 6 smallest files in the current directory
   this flag will only show directories with the parent same as the path provided.
   it will not list any files.
 
-```
+```bash
 sz ~/Documents/rl -l -D
 ```
 
@@ -80,7 +82,7 @@ sz ~/Documents/rl -l -D
 
 - you can recursively view all the directories in a path by providing the `-R` flag.
 
-```
+```bash
 sz ~/Documents/rl -l -D -R
 ```
 
@@ -88,7 +90,7 @@ sz ~/Documents/rl -l -D -R
 
 note that you can use all the options previously mentioned with the `-D` flag too.
 
-```
+```bash
 # shows the 3 largest directories in this path (including gitignored or hidden)
 sz ~/Documents/rl -l -D -R -i -g -d -n 3 
 ```
@@ -97,7 +99,7 @@ sz ~/Documents/rl -l -D -R -i -g -d -n 3
 
 - use the `-e` flag to exclude directories
 
-```
+```bash
 sz ~/Documents/rl -l -D -R -d -e ~/Documents/rl/public/ ~/Documents/rl/assets/
 ```
 
@@ -108,7 +110,7 @@ warning: this arg doesn't *really* work with the `-i` or `-g`
 - use the `-s` flag to show the total line count of all the files parsed. **Run this only with
   UTF-8 encoded files, obviously.**
 
-```
+```bash
 sz ./src -l -s
 ```
 
